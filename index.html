@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KrishiMitra — AI Farmer Advisory</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Custom styles -->
+  <link href="/static/css/style.css" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════ NAVBAR -->
+<nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+      <span class="brand-icon">🌾</span>
+      <span class="brand-name">KrishiMitra</span>
+      <span class="badge brand-badge">AI</span>
+    </a>
+    <div class="d-flex align-items-center gap-2 ms-auto">
+      <span class="status-dot" id="statusDot" title="AI Status"></span>
+      <span class="d-none d-sm-inline text-muted small" id="statusText">Connecting…</span>
+      <button class="btn btn-sm btn-outline-secondary ms-2" id="themeToggle" title="Toggle dark mode">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+      </button>
+      <button class="btn btn-sm d-lg-none ms-1" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+        <i class="bi bi-list fs-5"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════ LAYOUT -->
+<div class="app-shell d-flex">
+
+  <!-- ─────────────────────────────────────────── SIDEBAR (desktop) -->
+  <aside class="sidebar d-none d-lg-flex flex-column" id="desktopSidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" data-panel="chat">
+          <i class="bi bi-chat-dots-fill"></i><span>Chat Advisor</span>
+        </button>
+        <button class="sidebar-item" data-panel="dashboard">
+          <i class="bi bi-grid-1x2-fill"></i><span>Crop Dashboard</span>
+        </button>
+        <button class="sidebar-item" data-panel="soil">
+          <i class="bi bi-cloud-sun-fill"></i><span>Soil & Weather</span>
+        </button>
+        <button class="sidebar-item" data-panel="guidance">
+          <i class="bi bi-shield-check"></i><span>Fert / Pesticide</span>
+        </button>
+        <button class="sidebar-item" data-panel="farms">
+          <i class="bi bi-geo-alt-fill"></i><span>My Farms</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-section mt-3">
+      <div class="sidebar-label">Quick Prompts</div>
+      <div class="quick-prompts" id="quickPrompts">
+        <button class="qp-btn" data-msg="What crops should I sow in June in Maharashtra?">Kharif Sowing Calendar</button>
+        <button class="qp-btn" data-msg="My wheat leaves are turning yellow with brown spots. What disease is this?">Identify Crop Disease</button>
+        <button class="qp-btn" data-msg="How can I improve rice yield using organic methods?">Boost Rice Yield</button>
+        <button class="qp-btn" data-msg="Tell me about PM-KISAN and PMFBY schemes for small farmers.">Govt Schemes Info</button>
+        <button class="qp-btn" data-msg="How to save water in drip irrigation for cotton?">Water-saving Tips</button>
+        <button class="qp-btn" data-msg="Give me cost-saving recommendations for growing tomato.">Cost-saving Tips</button>
+      </div>
+    </div>
+
+    <div class="mt-auto sidebar-section">
+      <div class="sidebar-label">Session</div>
+      <button class="btn btn-outline-danger btn-sm w-100" id="clearChatBtn">
+        <i class="bi bi-trash me-1"></i>Clear Chat
+      </button>
+    </div>
+  </aside>
+
+  <!-- ─────────────────────────────── SIDEBAR (mobile offcanvas) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
+    <div class="offcanvas-header">
+      <h6 class="offcanvas-title">🌾 KrishiMitra Menu</h6>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-2">
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" data-panel="chat" data-bs-dismiss="offcanvas">
+          <i class="bi bi-chat-dots-fill"></i><span>Chat Advisor</span>
+        </button>
+        <button class="sidebar-item" data-panel="dashboard" data-bs-dismiss="offcanvas">
+          <i class="bi bi-grid-1x2-fill"></i><span>Crop Dashboard</span>
+        </button>
+        <button class="sidebar-item" data-panel="soil" data-bs-dismiss="offcanvas">
+          <i class="bi bi-cloud-sun-fill"></i><span>Soil & Weather</span>
+        </button>
+        <button class="sidebar-item" data-panel="guidance" data-bs-dismiss="offcanvas">
+          <i class="bi bi-shield-check"></i><span>Fert / Pesticide</span>
+        </button>
+        <button class="sidebar-item" data-panel="farms" data-bs-dismiss="offcanvas">
+          <i class="bi bi-geo-alt-fill"></i><span>My Farms</span>
+        </button>
+      </nav>
+      <hr />
+      <div class="sidebar-label">Quick Prompts</div>
+      <div class="quick-prompts">
+        <button class="qp-btn" data-msg="What crops should I sow in June in Maharashtra?" data-bs-dismiss="offcanvas">Kharif Sowing Calendar</button>
+        <button class="qp-btn" data-msg="My wheat leaves are turning yellow with brown spots." data-bs-dismiss="offcanvas">Identify Disease</button>
+        <button class="qp-btn" data-msg="How to improve rice yield organically?" data-bs-dismiss="offcanvas">Boost Yield</button>
+        <button class="qp-btn" data-msg="Tell me about PM-KISAN and PMFBY." data-bs-dismiss="offcanvas">Govt Schemes</button>
+      </div>
+      <hr />
+      <button class="btn btn-outline-danger btn-sm w-100 mt-1" id="clearChatBtnMobile">
+        <i class="bi bi-trash me-1"></i>Clear Chat
+      </button>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────── MAIN CONTENT -->
+  <main class="main-content flex-grow-1">
+
+    <!-- ══════════════════════════════ PANEL: CHAT -->
+    <section class="panel active" id="panel-chat">
+      <div class="chat-wrapper d-flex flex-column h-100">
+
+        <!-- Welcome hero (shown when chat is empty) -->
+        <div class="chat-hero" id="chatHero">
+          <div class="hero-icon">🌾</div>
+          <h2>Namaste, Kisan!</h2>
+          <p class="text-muted">I'm <strong>KrishiMitra</strong> — your AI-powered farming advisor.<br>Ask me about crops, pests, soil, weather, or government schemes.</p>
+          <div class="hero-chips">
+            <span class="chip" onclick="sendQuick('Best crops for black cotton soil?')">Black Cotton Soil</span>
+            <span class="chip" onclick="sendQuick('Organic pest control for vegetables')">Organic Pest Control</span>
+            <span class="chip" onclick="sendQuick('Rabi crop sowing tips for Punjab')">Punjab Rabi Tips</span>
+            <span class="chip" onclick="sendQuick('How to read Soil Health Card?')">Soil Health Card</span>
+          </div>
+        </div>
+
+        <!-- Messages area -->
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <!-- Typing indicator -->
+        <div class="typing-indicator d-none" id="typingIndicator">
+          <div class="typing-bubble">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="typing-text">KrishiMitra is thinking…</span>
+        </div>
+
+        <!-- Input bar -->
+        <div class="chat-input-bar">
+          <div class="input-group">
+            <textarea
+              id="userInput"
+              class="form-control chat-textarea"
+              rows="1"
+              placeholder="Ask about crops, pests, soil, weather, schemes…"
+              maxlength="1000"
+            ></textarea>
+            <button class="btn btn-send" id="sendBtn" title="Send">
+              <i class="bi bi-send-fill"></i>
+            </button>
+          </div>
+          <div class="input-footer d-flex justify-content-between align-items-center">
+            <span class="text-muted small">
+              <i class="bi bi-shield-check text-success"></i>
+              Safe advice · Always consult your local KVK for critical decisions
+            </span>
+            <span class="char-count" id="charCount">0 / 1000</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ PANEL: DASHBOARD -->
+    <section class="panel" id="panel-dashboard">
+      <div class="panel-header">
+        <h4><i class="bi bi-grid-1x2-fill text-success me-2"></i>Crop Health Dashboard</h4>
+        <p class="text-muted small">Real-time overview of your farm status and seasonal tips</p>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon bg-success-soft"><i class="bi bi-tree-fill text-success"></i></div>
+            <div class="stat-value" id="dashFarms">0</div>
+            <div class="stat-label">Active Farms</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon bg-warning-soft"><i class="bi bi-sun-fill text-warning"></i></div>
+            <div class="stat-value" id="dashSeason">—</div>
+            <div class="stat-label">Current Season</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon bg-info-soft"><i class="bi bi-droplet-fill text-info"></i></div>
+            <div class="stat-value">Moderate</div>
+            <div class="stat-label">Moisture Level</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-icon bg-danger-soft"><i class="bi bi-bug-fill text-danger"></i></div>
+            <div class="stat-value">Low</div>
+            <div class="stat-label">Pest Risk</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Crop health cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <h6 class="section-subtitle"><i class="bi bi-bar-chart-line me-1"></i>Crop Stage Progress</h6>
+        </div>
+        <div class="col-md-4">
+          <div class="crop-card">
+            <div class="crop-card-header"><span class="crop-emoji">🌾</span><strong>Wheat (Rabi)</strong></div>
+            <div class="crop-stage-label">Tillering Stage</div>
+            <div class="progress crop-progress"><div class="progress-bar bg-success" style="width:45%">45%</div></div>
+            <div class="crop-tip"><i class="bi bi-lightbulb text-warning"></i> Apply 2nd dose N now</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="crop-card">
+            <div class="crop-card-header"><span class="crop-emoji">🌽</span><strong>Maize (Kharif)</strong></div>
+            <div class="crop-stage-label">Vegetative Stage</div>
+            <div class="progress crop-progress"><div class="progress-bar bg-warning" style="width:30%">30%</div></div>
+            <div class="crop-tip"><i class="bi bi-lightbulb text-warning"></i> Scout for Fall Armyworm</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="crop-card">
+            <div class="crop-card-header"><span class="crop-emoji">🫘</span><strong>Soybean (Kharif)</strong></div>
+            <div class="crop-stage-label">Pod Fill Stage</div>
+            <div class="progress crop-progress"><div class="progress-bar bg-info" style="width:70%">70%</div></div>
+            <div class="crop-tip"><i class="bi bi-lightbulb text-warning"></i> Reduce irrigation now</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seasonal calendar -->
+      <div class="row g-3">
+        <div class="col-12">
+          <h6 class="section-subtitle"><i class="bi bi-calendar3 me-1"></i>Sowing Calendar — Quick Reference</h6>
+          <div class="table-responsive">
+            <table class="table table-hover advisory-table">
+              <thead>
+                <tr>
+                  <th>Season</th><th>Window</th><th>Top Crops</th><th>Key Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge bg-success">Kharif</span></td>
+                  <td>Jun – Jul</td>
+                  <td>Rice, Maize, Soybean, Cotton, Groundnut</td>
+                  <td>Land prep + basal fertiliser</td>
+                </tr>
+                <tr>
+                  <td><span class="badge bg-warning text-dark">Rabi</span></td>
+                  <td>Oct – Nov</td>
+                  <td>Wheat, Mustard, Gram, Lentil, Barley</td>
+                  <td>Seed treatment + irrigation plan</td>
+                </tr>
+                <tr>
+                  <td><span class="badge bg-info text-dark">Zaid</span></td>
+                  <td>Feb – Mar</td>
+                  <td>Watermelon, Cucumber, Moong</td>
+                  <td>Raised beds + mulching</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 text-center">
+        <button class="btn btn-success btn-sm" onclick="switchPanel('chat'); sendQuick('Give me a detailed crop health analysis and recommendations for my farms.')">
+          <i class="bi bi-chat-dots me-1"></i>Ask AI for Personalised Analysis
+        </button>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ PANEL: SOIL & WEATHER -->
+    <section class="panel" id="panel-soil">
+      <div class="panel-header">
+        <h4><i class="bi bi-cloud-sun-fill text-primary me-2"></i>Soil & Weather Advisory</h4>
+        <p class="text-muted small">Soil health insights and seasonal weather guidance</p>
+      </div>
+      <div class="row g-3 mb-4">
+        <!-- Soil types -->
+        <div class="col-md-6">
+          <div class="advisory-card h-100">
+            <h6 class="advisory-card-title"><i class="bi bi-layers me-1"></i>Soil Type Guide</h6>
+            <div class="soil-grid">
+              <div class="soil-item">
+                <span class="soil-dot" style="background:#6b4e2a"></span>
+                <div><strong>Black (Regur)</strong><br><small class="text-muted">High moisture retention · Best for cotton, wheat</small></div>
+              </div>
+              <div class="soil-item">
+                <span class="soil-dot" style="background:#c8a96e"></span>
+                <div><strong>Red Laterite</strong><br><small class="text-muted">Well-drained · Best for groundnut, millets</small></div>
+              </div>
+              <div class="soil-item">
+                <span class="soil-dot" style="background:#a0856c"></span>
+                <div><strong>Alluvial</strong><br><small class="text-muted">Fertile, river plains · Best for rice, wheat, sugarcane</small></div>
+              </div>
+              <div class="soil-item">
+                <span class="soil-dot" style="background:#d4c5a9"></span>
+                <div><strong>Sandy Loam</strong><br><small class="text-muted">Low retention · Best for watermelon, moong</small></div>
+              </div>
+            </div>
+            <div class="mt-3">
+              <button class="btn btn-outline-success btn-sm" onclick="switchPanel('chat'); sendQuick('Explain how to interpret my Soil Health Card and what amendments to add for my soil type.')">
+                <i class="bi bi-chat-dots me-1"></i>Ask AI about my soil
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weather seasons -->
+        <div class="col-md-6">
+          <div class="advisory-card h-100">
+            <h6 class="advisory-card-title"><i class="bi bi-cloud-rain me-1"></i>Monsoon Advisory</h6>
+            <div class="weather-timeline">
+              <div class="wt-item">
+                <span class="wt-badge bg-info">Jun–Sep</span>
+                <div><strong>Southwest Monsoon</strong><br><small>Kharif sowing · Monitor waterlogging · Apply Jeevamrit</small></div>
+              </div>
+              <div class="wt-item">
+                <span class="wt-badge bg-warning text-dark">Oct–Dec</span>
+                <div><strong>Retreating Monsoon</strong><br><small>Rabi land prep · Soil testing · Weed control</small></div>
+              </div>
+              <div class="wt-item">
+                <span class="wt-badge bg-danger">Jan–Mar</span>
+                <div><strong>Winter / Fog</strong><br><small>Frost protection · Rabi irrigation · Powdery mildew watch</small></div>
+              </div>
+              <div class="wt-item">
+                <span class="wt-badge bg-success">Apr–May</span>
+                <div><strong>Pre-Monsoon Heat</strong><br><small>Zaid crops · Summer ploughing · Mulching essential</small></div>
+              </div>
+            </div>
+            <div class="mt-3 d-flex gap-2">
+              <a href="https://mausam.imd.gov.in" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-box-arrow-up-right me-1"></i>IMD Forecast
+              </a>
+              <a href="https://play.google.com/store/apps/details?id=in.gov.meghdoot" target="_blank" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-phone me-1"></i>Meghdoot App
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Irrigation guide -->
+      <div class="advisory-card mb-3">
+        <h6 class="advisory-card-title"><i class="bi bi-droplet-half me-1"></i>Irrigation Quick Guide</h6>
+        <div class="row g-2 mt-1">
+          <div class="col-6 col-md-3">
+            <div class="irr-card">
+              <div class="irr-icon">💧</div>
+              <strong>Drip</strong>
+              <small>90% efficiency · Vegetables, Fruit crops, Sugarcane</small>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="irr-card">
+              <div class="irr-icon">🌀</div>
+              <strong>Sprinkler</strong>
+              <small>75–85% efficiency · Wheat, Pulses, Oil seeds</small>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="irr-card">
+              <div class="irr-icon">🌊</div>
+              <strong>Flood</strong>
+              <small>50–60% · Paddy, Sugarcane</small>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="irr-card">
+              <div class="irr-icon">🪣</div>
+              <strong>Furrow</strong>
+              <small>65% · Row crops, Maize, Cotton</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ PANEL: FERTILISER / PESTICIDE GUIDANCE -->
+    <section class="panel" id="panel-guidance">
+      <div class="panel-header">
+        <h4><i class="bi bi-shield-check text-warning me-2"></i>Fertiliser & Pesticide Guidance</h4>
+        <p class="text-muted small">Safe, responsible input management</p>
+      </div>
+
+      <!-- Safety banner -->
+      <div class="alert alert-warning d-flex gap-2 align-items-start mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5 mt-1 flex-shrink-0"></i>
+        <div>
+          <strong>Safety First:</strong> KrishiMitra never recommends specific pesticide dosages.
+          Always <strong>read the label</strong>, wear PPE (gloves, mask, protective clothing),
+          and consult your local agri-input dealer or KVK for precise dosing.
+          Poisoning helpline: <strong>1800-180-1551</strong> (toll-free).
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="advisory-card h-100">
+            <h6 class="advisory-card-title"><i class="bi bi-droplet me-1 text-success"></i>Fertiliser Basics (NPK)</h6>
+            <table class="table table-sm advisory-table mt-2">
+              <thead><tr><th>Nutrient</th><th>Role</th><th>Deficiency Sign</th></tr></thead>
+              <tbody>
+                <tr><td><strong>N (Nitrogen)</strong></td><td>Leaf / shoot growth</td><td>Yellowing from bottom</td></tr>
+                <tr><td><strong>P (Phosphorus)</strong></td><td>Root & flower</td><td>Purple/red leaves</td></tr>
+                <tr><td><strong>K (Potassium)</strong></td><td>Fruit & stress resistance</td><td>Leaf margin burn</td></tr>
+                <tr><td><strong>Zn (Zinc)</strong></td><td>Enzyme function</td><td>Khaira disease (rice)</td></tr>
+                <tr><td><strong>B (Boron)</strong></td><td>Pollen viability</td><td>Hollow stem, fruit drop</td></tr>
+              </tbody>
+            </table>
+            <div class="mt-2">
+              <span class="badge bg-success-soft text-success border border-success-subtle me-1">Urea (46% N)</span>
+              <span class="badge bg-success-soft text-success border border-success-subtle me-1">DAP (18-46-0)</span>
+              <span class="badge bg-success-soft text-success border border-success-subtle">MOP (60% K₂O)</span>
+            </div>
+            <p class="mt-2 small text-muted"><i class="bi bi-info-circle me-1"></i>Get a Soil Health Card (SHC) for precise NPK recommendation for your plot.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="advisory-card h-100">
+            <h6 class="advisory-card-title"><i class="bi bi-bug me-1 text-danger"></i>Integrated Pest Management (IPM)</h6>
+            <div class="ipm-steps">
+              <div class="ipm-step"><span class="ipm-num">1</span><div><strong>Scout regularly</strong><br><small>5-point field walk, early detection saves crops</small></div></div>
+              <div class="ipm-step"><span class="ipm-num">2</span><div><strong>Cultural control</strong><br><small>Crop rotation, resistant varieties, clean cultivation</small></div></div>
+              <div class="ipm-step"><span class="ipm-num">3</span><div><strong>Biological control</strong><br><small>Trichogramma cards, NPV, Beauveria bassiana</small></div></div>
+              <div class="ipm-step"><span class="ipm-num">4</span><div><strong>Chemical (last resort)</strong><br><small>Use only when Economic Threshold Level (ETL) crossed</small></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Organic options -->
+      <div class="advisory-card mb-3">
+        <h6 class="advisory-card-title"><i class="bi bi-flower1 me-1 text-success"></i>Organic / Natural Farming Inputs</h6>
+        <div class="row g-2 mt-1">
+          <div class="col-6 col-md-3">
+            <div class="organic-card">
+              <strong>Jeevamrit</strong>
+              <small>Bio-stimulant from cow dung + urine + jaggery</small>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="organic-card">
+              <strong>Beejamrit</strong>
+              <small>Bio-seed treatment to protect against soil-borne pathogens</small>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="organic-card">
+              <strong>Vermicompost</strong>
+              <small>Improves soil structure; apply 3–5 t/ha</small>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="organic-card">
+              <strong>Neem Cake</strong>
+              <small>Soil amendment + pest deterrent (neem seed kernel extract)</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-success btn-sm" onclick="switchPanel('chat'); sendQuick('I want to switch to organic farming. What steps should I follow and which inputs should I use?')">
+          <i class="bi bi-chat-dots me-1"></i>Ask AI for Personalised Fertiliser Plan
+        </button>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ PANEL: MY FARMS -->
+    <section class="panel" id="panel-farms">
+      <div class="panel-header d-flex justify-content-between align-items-center">
+        <div>
+          <h4><i class="bi bi-geo-alt-fill text-success me-2"></i>My Farm Profiles</h4>
+          <p class="text-muted small">Manage multiple plots — the AI will tailor advice per farm</p>
+        </div>
+        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addFarmModal">
+          <i class="bi bi-plus-circle me-1"></i>Add Farm
+        </button>
+      </div>
+
+      <div id="farmList" class="row g-3 mb-3">
+        <!-- Populated by JS -->
+        <div class="col-12 text-center text-muted py-4" id="noFarmsMsg">
+          <i class="bi bi-geo-alt fs-2 mb-2 d-block"></i>
+          No farms added yet. Click <strong>Add Farm</strong> to get started.
+        </div>
+      </div>
+
+      <div class="advisory-card mt-2">
+        <h6 class="advisory-card-title"><i class="bi bi-info-circle me-1"></i>How Farm Profiles Work</h6>
+        <ul class="small text-muted mb-0">
+          <li>Add each of your plots with soil type, irrigation source, and current crops.</li>
+          <li>KrishiMitra uses this context in every chat to give tailored, farm-specific advice.</li>
+          <li>You can manage up to <strong>10 farm profiles</strong> per session.</li>
+          <li>Click the chat button on a farm card to ask specific questions about that plot.</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+</div><!-- /app-shell -->
+
+<!-- ══════════════════════════════════════════════════════ ADD FARM MODAL -->
+<div class="modal fade" id="addFarmModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2 text-success"></i>Add Farm Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addFarmForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Farm Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="farmName" placeholder="e.g., North Plot – Nagpur" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Location (District, State)</label>
+              <input type="text" class="form-control" id="farmLocation" placeholder="e.g., Yavatmal, Maharashtra" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Farm Area</label>
+              <input type="text" class="form-control" id="farmArea" placeholder="e.g., 2.5 acres or 1 ha" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Soil Type</label>
+              <select class="form-select" id="farmSoil">
+                <option value="">Select soil type</option>
+                <option>Black (Regur)</option>
+                <option>Red Laterite</option>
+                <option>Alluvial</option>
+                <option>Sandy Loam</option>
+                <option>Clay Loam</option>
+                <option>Loamy</option>
+                <option>Saline / Alkaline</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Irrigation Source</label>
+              <select class="form-select" id="farmIrrigation">
+                <option value="">Select irrigation</option>
+                <option>Rainfed (No irrigation)</option>
+                <option>Drip Irrigation</option>
+                <option>Sprinkler</option>
+                <option>Canal / River</option>
+                <option>Borewell / Tubewell</option>
+                <option>Pond / Tank</option>
+                <option>Mixed</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Current / Recent Crops</label>
+              <input type="text" class="form-control" id="farmCrops" placeholder="e.g., Cotton, then Wheat" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Additional Notes</label>
+              <textarea class="form-control" id="farmNotes" rows="2"
+                placeholder="e.g., Old orchard on 0.5 ac, problem with termites, SHC received last year"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" id="saveFarmBtn">
+          <i class="bi bi-check-circle me-1"></i>Save Farm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Marked.js for markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<!-- App logic -->
+<script src="/static/js/app.js"></script>
+</body>
+</html>
